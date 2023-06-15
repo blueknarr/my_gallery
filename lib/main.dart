@@ -64,21 +64,27 @@ class _MyGalleryAppState extends State<MyGalleryApp> {
       /// 사진을 가져와서 메모리에 담았다가 사용한다.
       body: images == null
           ? const Center(child: Text('No data'))
-          : FutureBuilder<Uint8List>(
-              future: images![0].readAsBytes(),
-              builder: (context, snapshot) {
-                /// UI를 구성하는 부분, 사진ㅇ은 snapshot을 통해 들어온다.
-                final data = snapshot.data;
+          : PageView(
+              /// PageView : 사진을 좌,우로 돌릴 수 있다.
+              children: images!.map((image) {
+                return FutureBuilder<Uint8List>(
+                    future: image.readAsBytes(),
+                    builder: (context, snapshot) {
+                      /// UI를 구성하는 부분, 사진ㅇ은 snapshot을 통해 들어온다.
+                      final data = snapshot.data;
 
-                if (data == null ||
-                    snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                return Image.memory(
-                  data,
-                  width: double.infinity,
-                );
-              }),
+                      if (data == null ||
+                          snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+
+                      return Image.memory(
+                        data,
+                        width: double.infinity,
+                      );
+                    });
+              }).toList(),
+            ),
     );
   }
 }

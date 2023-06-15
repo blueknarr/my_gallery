@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -55,11 +57,28 @@ class _MyGalleryAppState extends State<MyGalleryApp> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text('전자액자'),
-        ),
+      appBar: AppBar(
+        title: const Text('전자액자'),
+      ),
 
-        /// 사진을 가져와서 메모리에 담았다가 사용한다.
-        body: Image.memory(bytes));
+      /// 사진을 가져와서 메모리에 담았다가 사용한다.
+      body: images == null
+          ? const Center(child: Text('No data'))
+          : FutureBuilder<Uint8List>(
+              future: images![0].readAsBytes(),
+              builder: (context, snapshot) {
+                /// UI를 구성하는 부분, 사진ㅇ은 snapshot을 통해 들어온다.
+                final data = snapshot.data;
+
+                if (data == null ||
+                    snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                return Image.memory(
+                  data,
+                  width: double.infinity,
+                );
+              }),
+    );
   }
 }
